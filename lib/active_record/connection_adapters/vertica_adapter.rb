@@ -33,13 +33,13 @@ module ActiveRecord
       ConnectionAdapters::Vertica.new(conn)
     end
 
-    class << self
-      private
-      def instantiate(record)
-        model = find_sti_class(record[inheritance_column]).new(record)
-        model
-      end
-    end
+    #class << self
+    #  private
+    #  def instantiate(record)
+    #    model = find_sti_class(record[inheritance_column]).new(record)
+    #    model
+    #  end
+    #end
   end
 
   module ConnectionAdapters
