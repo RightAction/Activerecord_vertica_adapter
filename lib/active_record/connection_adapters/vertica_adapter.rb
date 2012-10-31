@@ -139,7 +139,7 @@ module ActiveRecord
 
       ## QUOTING
       def quote_column_name(name) #:nodoc:
-        "'#{name}'"
+        "#{name}"
       end
 
       def quote_table_name(name) #:nodoc:
