@@ -50,6 +50,10 @@ module ActiveRecord
     class Vertica < AbstractAdapter
       ADAPTER_NAME = 'Vertica'.freeze
 
+      def supports_migrations?
+        true
+      end
+
       def adapter_name #:nodoc:
         ADAPTER_NAME
       end
