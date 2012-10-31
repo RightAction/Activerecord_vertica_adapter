@@ -50,6 +50,26 @@ module ActiveRecord
     class Vertica < AbstractAdapter
       ADAPTER_NAME = 'Vertica'.freeze
 
+      NATIVE_DATABASE_TYPES = {
+        :primary_key => "serial primary key".freeze,
+        :string      => { :name => "character varying", :limit => 255 },
+        :text        => { :name => "text" },
+        :integer     => { :name => "integer" },
+        :float       => { :name => "float" },
+        :decimal     => { :name => "decimal" },
+        :datetime    => { :name => "timestamp" },
+        :timestamp   => { :name => "timestamp" },
+        :time        => { :name => "time" },
+        :date        => { :name => "date" },
+        :binary      => { :name => "bytea" },
+        :boolean     => { :name => "boolean" },
+        :xml         => { :name => "xml" }
+      }
+
+      def native_database_types #:nodoc:
+        NATIVE_DATABASE_TYPES
+      end
+
       def supports_migrations?
         true
       end
