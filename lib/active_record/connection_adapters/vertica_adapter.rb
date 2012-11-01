@@ -114,7 +114,7 @@ module ActiveRecord
       end
 
       def tables(name = nil) #:nodoc:
-        sql = "SELECT * FROM tables WHERE table_schema = #{quote_column_name(schema_name)}"
+        sql = "SELECT * FROM tables WHERE table_schema = '#{schema_name}'"
 
         tables = []
         execute(sql, name) { |field| tables << field[:table_name] }
@@ -122,7 +122,7 @@ module ActiveRecord
       end
 
       def columns(table_name, name = nil)#:nodoc:
-        sql = "SELECT * FROM columns WHERE table_name = #{quote_column_name(table_name)}"
+        sql = "SELECT * FROM columns WHERE table_name = '#{table_name}'"
 
         columns = []
         execute(sql, name){ |field| columns << VerticaColumn.new(field[:column_name],field[:column_default],field[:data_type],field[:is_nullable])}
@@ -132,9 +132,37 @@ module ActiveRecord
       def select(sql, name = nil)
         rows = []
         @connection = ::Vertica.connect(@connection.options)
-        @connection.query(sql,name) {|row| rows << row }
+        @connection.query(sql) {|row| rows << row }
         @connection.close
         rows
+      end
+
+      def select_rows(sql, name = nil)
+        select(sql, name)
+      end
+
+      def add_index(table_name, column_name, options = {})
+        #no indicies in vertica
+      end
+
+      def add_column(table_name, column_name, type, options = {})
+        default = options[:default]
+        notnull = options[:null] == false
+
+        # Add the column.
+        execute("ALTER TABLE #{quote_table_name(table_name)} ADD COLUMN #{quote_column_name(column_name)} #{type_to_sql(type, options[:limit], options[:precision], options[:scale])}")
+
+        change_column_default(table_name, column_name, default) if options_include_default?(options)
+        change_column_null(table_name, column_name, false, default) if notnull
+      end
+
+      # Changes the default value of a table column.
+      def change_column_default(table_name, column_name, default)
+        execute "ALTER TABLE #{quote_table_name(table_name)} ALTER COLUMN #{quote_column_name(column_name)} SET DEFAULT #{quote(default)}"
+      end
+
+      def change_column_null(table_name, column_name, null, default = nil)
+        execute("ALTER TABLE #{quote_table_name(table_name)} ALTER #{quote_column_name(column_name)} #{null ? 'DROP' : 'SET'} NOT NULL")
       end
 
       ## QUOTING
