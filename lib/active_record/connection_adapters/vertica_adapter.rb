@@ -98,10 +98,12 @@ module ActiveRecord
         log(sql,name) do
           if block_given?
             @connection = ::Vertica.connect(@connection.options)
+            @connection.query("SET AUTOCOMMIT TO ON")
             @connection.query(sql) {|row| yield row }
             @connection.close
           else
             @connection = ::Vertica.connect(@connection.options)
+            @connection.query("SET AUTOCOMMIT TO ON")
             results = @connection.query(sql)
             @connection.close
             results
