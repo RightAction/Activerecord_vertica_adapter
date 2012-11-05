@@ -140,7 +140,8 @@ module ActiveRecord
       end
 
       def select_rows(sql, name = nil)
-        select(sql, name)
+        rows = select(sql, name)
+        rows.map{|r| r.map{|k,v| v}}
       end
 
       def add_index(table_name, column_name, options = {})
